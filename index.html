@@ -61,6 +61,7 @@
 
   /* hero: dark side view + a cursor-reactive dot field + HUD readouts */
   .hero { position: relative; height: 100vh; height: 100svh; min-height: 600px; overflow: hidden; background: #000; }
+  .hero picture { position: absolute; inset: 0; }
   .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; transform-origin: 55% 60%; }
   @media (prefers-reduced-motion: no-preference) { .hero img { animation: push 24s ease-in-out infinite alternate; } }
   @keyframes push { from { transform: scale(1.02); } to { transform: scale(1.1) translateX(-1.2%); } }
@@ -108,8 +109,8 @@
     .intro .wrap { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
-    .hero { height: 60svh; min-height: 400px; }
-    .hero img { object-fit: contain; object-position: 50% 38%; animation: none; }
+    .hero { height: auto; min-height: 0; aspect-ratio: 4 / 5; }
+    .hero img { object-position: 50% 50%; animation: none; }
     .clock { display: none; }
     .hud { display: none; }
   }
@@ -128,7 +129,18 @@
 
 <main>
   <section class="hero" aria-label="Grade Core" style="padding:0">
-    <img src="media/grade-core-reveal.jpg" width="1920" height="1080" alt="Grade Core in low studio light, side view, in front of the Grade Robotics logo">
+    <picture>
+      <!-- phones held upright: portrait framing with the logo above the pod -->
+      <source media="(max-width: 600px) and (orientation: portrait)" type="image/avif" srcset="media/hero/hero-portrait-720.avif 720w, media/hero/hero-portrait-1080.avif 1080w" sizes="100vw">
+      <source media="(max-width: 600px) and (orientation: portrait)" type="image/webp" srcset="media/hero/hero-portrait-720.webp 720w, media/hero/hero-portrait-1080.webp 1080w" sizes="100vw">
+      <source media="(max-width: 600px) and (orientation: portrait)" srcset="media/hero/hero-portrait-1080.jpg">
+      <!-- ultra-wide screens: extra black margin so cover-cropping never cuts the logo or LiDAR -->
+      <source media="(min-aspect-ratio: 21/9)" type="image/avif" srcset="media/hero/hero-wide-2560.avif 2560w, media/hero/hero-wide-3840.avif 3840w" sizes="100vw">
+      <source media="(min-aspect-ratio: 21/9)" type="image/webp" srcset="media/hero/hero-wide-2560.webp 2560w, media/hero/hero-wide-3840.webp 3840w" sizes="100vw">
+      <source type="image/avif" srcset="media/hero/hero-1280.avif 1280w, media/hero/hero-1920.avif 1920w, media/hero/hero-2560.avif 2560w, media/hero/hero-3840.avif 3840w" sizes="100vw">
+      <source type="image/webp" srcset="media/hero/hero-1280.webp 1280w, media/hero/hero-1920.webp 1920w, media/hero/hero-2560.webp 2560w, media/hero/hero-3840.webp 3840w" sizes="100vw">
+      <img src="media/hero/hero-1920.jpg" width="3840" height="2160" fetchpriority="high" alt="Grade Core in low studio light, side view, in front of the Grade Robotics logo">
+    </picture>
     <canvas id="field" aria-hidden="true"></canvas>
     <div class="shade"></div>
     <div class="copy">
