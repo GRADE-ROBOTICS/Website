@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grade Robotics</title>
+<meta name="description" content="Software, sensors and machine autonomy for earthworks contractors. See where your fleet is losing time, and fix it before it costs a day.">
+<meta name="theme-color" content="#1A1A1A">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* One committed dark look (brand charcoal + Grade Orange), painted explicitly. */
+  :root {
+    --bg: #1A1A1A; --bg-2: #141312; --surface: #26231F; --line: #36312C;
+    --text: #EEE9E3; --muted: #A8A097; --faint: #7A726A;
+    --orange: #D9521A;      /* Grade Orange, brand */
+    --orange-ui: #C74A17;   /* same hue, 4.5:1 with white text: buttons and the CTA block */
+    --orange-hi: #EE6A30;   /* small orange text on charcoal */
+    --paper: #EFEAE3; --ink: #1A1A1A;
+    --display: "Chakra Petch", Bahnschrift, "Arial Narrow", sans-serif;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--orange-hi); outline-offset: 3px; }
+  h1, h2, h3, h4 { font-family: var(--display); text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  .wrap { max-width: 1280px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 48px); }
+
+  .eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--orange-hi); margin-bottom: 16px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; font: 600 15px/1 var(--body); padding: 16px 22px; text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%); transition: background-color .2s; }
+  .btn-primary { background: var(--orange-ui); color: #fff; }
+  .btn-primary:hover { background: #B24115; }
+  .btn-dark { background: var(--bg); color: #fff; }
+  .btn-dark:hover { background: #000; }
+  .btn-sm { padding: 12px 16px; font-size: 14px; }
+  .link { font-weight: 500; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 3px; transition: border-color .2s; }
+  .link:hover { border-color: var(--orange-hi); }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; background: radial-gradient(120% 90% at 72% 0%, #2B2520 0%, var(--bg) 62%); }
+  .nav { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 22px; }
+  .nav-logo img { height: 40px; width: auto; display: block; margin-left: -6px; }
+  .nav-links { display: flex; gap: 30px; font-size: 14px; font-weight: 500; }
+  .nav-links a { text-decoration: none; color: var(--muted); transition: color .2s; }
+  .nav-links a:hover { color: var(--text); }
+  .hero-stage { position: relative; height: clamp(300px, 46vw, 620px); }
+  .hero-word { position: absolute; left: 0; right: 0; bottom: 12%; text-align: center; white-space: nowrap; user-select: none; pointer-events: none;
+    font: 700 clamp(104px, 27vw, 440px)/.8 var(--display); letter-spacing: -.035em;
+    background: linear-gradient(180deg, #E55F24 0%, #C94A18 42%, rgba(201,74,24,.3) 80%, rgba(201,74,24,.08) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hero-copy { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 40px; align-items: end; padding-block: 8px clamp(56px, 8vw, 96px); }
+  .hero h1 { font-size: clamp(32px, 4.4vw, 58px); font-weight: 600; line-height: 1.05; letter-spacing: -.01em; max-width: 17ch; }
+  .hero h1 em { font-style: normal; color: var(--orange-hi); }
+  .lede { color: var(--muted); font-size: 18px; max-width: 54ch; margin-block: 22px 30px; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; }
+  .pilot { justify-self: end; max-width: 380px; padding: 22px 24px; background: rgba(44,40,36,.55); border: 1px solid var(--line);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); display: grid; gap: 10px; }
+  .pilot-tag { display: flex; align-items: center; gap: 10px; font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--orange-hi); }
+  .pilot-tag i { width: 8px; height: 8px; background: var(--orange-hi); }
+  .pilot-foot { color: var(--muted); font-size: 14px; }
+
+  /* ---------- Statement ---------- */
+  .statement { padding-block: clamp(80px, 11vw, 150px); border-top: 1px solid var(--line); }
+  .statement-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 48px 64px; align-items: end; }
+  .big { font: 500 clamp(28px, 3.7vw, 50px)/1.15 var(--display); max-width: 23ch; text-wrap: balance; }
+  .big span { color: var(--orange-hi); }
+  .statement-side { display: grid; gap: 14px; color: var(--muted); max-width: 46ch; }
+  .cycle { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 12px; padding: 0; margin: 12px 0 0; font: 500 13px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text); }
+  .cycle li + li::before { content: "→"; color: var(--orange-hi); margin-right: 12px; }
+  .cycle li:last-child { color: var(--orange-hi); }
+
+  /* ---------- Fleet story (pinned) ---------- */
+  .story { position: relative; height: 720vh; background: var(--bg-2); }
+  .pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .pin canvas, .pin video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+  .story-ui { position: absolute; top: 0; left: 0; right: 0; padding-top: clamp(20px, 7vh, 72px); pointer-events: none; }
+  .story-ui h2 { font-size: clamp(24px, 3vw, 40px); font-weight: 600; line-height: 1.1; color: #F4EFE9; max-width: 17ch; }
+  .stages { list-style: none; padding: 0; margin: 22px 0 0; display: grid; max-width: 430px; }
+  .stage { grid-area: 1 / 1; padding: 18px 20px; background: rgba(16,15,14,.86); border: 1px solid rgba(233,227,219,.12); opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s; }
+  .stage.is-active { opacity: 1; transform: none; }
+  .stage-no { display: block; font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--orange-hi); margin-bottom: 10px; }
+  .stage h3 { font-size: 23px; font-weight: 600; color: #F4EFE9; margin-bottom: 6px; }
+  .stage p { font-size: 15px; line-height: 1.5; color: #CFC8BF; }
+  .story-note { margin-top: 10px; font: 400 11px/1.4 var(--mono); color: rgba(242,237,231,.55); }
+  .progress { position: absolute; left: 0; right: 0; bottom: clamp(16px, 4vh, 36px); display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; pointer-events: none; }
+  .seg span { display: block; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(242,237,231,.5); white-space: nowrap; transition: color .3s; }
+  .seg.is-active span { color: #fff; }
+  .seg b { display: block; height: 2px; margin-top: 9px; background: rgba(242,237,231,.2); overflow: hidden; }
+  .seg i { display: block; height: 100%; background: var(--orange); transform: scaleX(0); transform-origin: left; }
+
+  /* ---------- Facts ---------- */
+  .facts-sec { padding-block: clamp(64px, 8vw, 110px); }
+  .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+  .fact { display: flex; flex-direction: column; gap: 12px; padding: clamp(24px, 3vw, 40px) clamp(16px, 2vw, 28px); border-left: 1px solid var(--line); }
+  .fact:first-child { border-left: 0; padding-left: 0; }
+  .fact b { font: 600 clamp(46px, 5.6vw, 82px)/.95 var(--display); font-variant-numeric: tabular-nums; }
+  .fact b small { font-size: .36em; color: var(--orange-hi); margin-left: 6px; }
+  .fact span { color: var(--muted); font-size: 15px; max-width: 26ch; }
+
+  /* ---------- Section heads ---------- */
+  .sec-head { display: grid; gap: 4px; max-width: 760px; }
+  .sec-head h2 { font-size: clamp(30px, 3.9vw, 52px); font-weight: 600; line-height: 1.07; }
+  .sec-lede { color: var(--muted); font-size: 18px; margin-top: 14px; max-width: 56ch; }
+
+  /* ---------- Products (paper sheet) ---------- */
+  .products { background: var(--paper); color: var(--ink); padding-block: clamp(72px, 9vw, 128px); }
+  .products .eyebrow { color: #A83F12; }
+  .products .sec-lede { color: #5A534B; }
+  .group { display: flex; align-items: center; gap: 10px; margin: 52px 0 14px; font: 600 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #5E574F; }
+  .group::before { content: ""; width: 13px; height: 13px; background: var(--orange); clip-path: polygon(0 100%, 55% 0, 100% 0, 45% 100%); }
+  .prod-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #D6CEC4; border: 1px solid #D6CEC4; }
+  .prod { background: var(--paper); padding: 28px 26px 26px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .prod h4 { font-size: 23px; font-weight: 600; line-height: 1.15; margin-top: 6px; }
+  .prod p { color: #48423C; max-width: 36ch; }
+  .icon { width: 56px; height: 56px; display: grid; place-items: center; background: var(--ink); color: var(--orange);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+  .hw .icon { background: var(--orange); color: #fff; }
+  .icon svg { width: 36px; height: 36px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: square; stroke-linejoin: miter; }
+  .icon svg .f { fill: currentColor; stroke: none; }
+  .status { margin-top: auto; font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 7px 9px; background: #F6DDCF; color: #9A3A10; }
+  .status.soft { background: #E3DCD3; color: #574F47; }
+
+  /* ---------- What's built ---------- */
+  .built { padding-block: clamp(72px, 9vw, 128px); }
+  .built-list { list-style: none; margin: 44px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .built-list li { display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 1fr) auto; gap: 10px 40px; align-items: baseline; padding-block: 26px; border-bottom: 1px solid var(--line); }
+  .built-list h3 { font-size: 21px; font-weight: 600; line-height: 1.2; }
+  .built-list p { color: var(--muted); max-width: 62ch; }
+  .tag { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--orange-hi); border: 1px solid rgba(238,106,48,.45); padding: 7px 9px; white-space: nowrap; }
+
+  /* ---------- CTA + title-block footer ---------- */
+  .cta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px 48px; align-items: end; padding: clamp(32px, 5vw, 64px);
+    background: var(--orange-ui); color: #fff; clip-path: polygon(0 0, calc(100% - 44px) 0, 100% 44px, 100% 100%, 0 100%); }
+  .cta .eyebrow { color: #FFE2D3; }
+  .cta h2 { font-size: clamp(28px, 3.4vw, 46px); font-weight: 600; line-height: 1.08; max-width: 21ch; }
+  .cta p { margin-top: 16px; max-width: 54ch; font-size: 17px; }
+  .titleblock { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); margin-top: clamp(56px, 8vw, 96px); }
+  .tb { display: flex; flex-direction: column; justify-content: center; gap: 7px; min-width: 0; padding: 16px 18px; border-left: 1px solid var(--line); font-size: 14px; overflow-wrap: anywhere; }
+  .tb:first-child { border-left: 0; }
+  .tb span { font: 500 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .tb a { text-decoration: none; }
+  .tb a:hover { color: var(--orange-hi); }
+  .tb-logo img { height: 34px; width: auto; display: block; margin-left: -4px; }
+  .fine { color: var(--faint); font-size: 13px; padding-block: 18px 44px; }
+
+  @media (max-width: 900px) {
+    .hero-copy, .statement-grid, .cta { grid-template-columns: 1fr; }
+    .pilot { justify-self: start; }
+    .prod-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fact:nth-child(odd) { border-left: 0; padding-left: 0; }
+    .fact:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .built-list li { grid-template-columns: 1fr; }
+    .tag { justify-self: start; }
+    .titleblock { grid-template-columns: 1fr 1fr; }
+    .tb { border-top: 1px solid var(--line); }
+    .tb-logo { grid-column: 1 / -1; border-top: 0; }
+    .tb:nth-child(2n) { border-left: 0; }
+  }
+  @media (max-width: 760px) { .nav-links { display: none; } }
+  @media (max-width: 600px) {
+    .prod-grid { grid-template-columns: 1fr; }
+    .seg span { display: none; }
+    .stage p { font-size: 14px; }
+    .hero-word { bottom: 30%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .stage, .btn, .link { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <nav class="wrap nav" aria-label="Main">
+    <a class="nav-logo" href="#top"><img src="logo.svg" alt="Grade Robotics" width="706" height="222"></a>
+    <div class="nav-links">
+      <a href="#fleet">The fleet</a>
+      <a href="#products">Products</a>
+      <a href="#built">What's built</a>
+    </div>
+    <a class="btn btn-primary btn-sm" href="mailto:jiten@grade-robotics.com?subject=Grade%20pilot">Start a pilot</a>
+  </nav>
+
+  <div class="hero-stage">
+    <div class="hero-word" aria-hidden="true">GRADE</div>
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  </div>
+
+  <div class="wrap hero-copy">
+    <div>
+      <p class="eyebrow">Earthworks fleets, coordinated</p>
+      <h1>See where your fleet is losing time, <em>and fix it before it costs a day.</em></h1>
+      <p class="lede">Software, sensors and machine autonomy for pipeline and highway contractors. Excavators, tippers and graders working as one fleet, not a line of machines waiting on each other.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="mailto:jiten@grade-robotics.com?subject=Grade%20pilot">Start a pilot <span aria-hidden="true">→</span></a>
+        <a class="link" href="#fleet">See the fleet at work</a>
+      </div>
+    </div>
+    <aside class="pilot" aria-label="Pilot offer">
+      <p class="pilot-tag"><i></i>Pilots open</p>
+      <p>We run Grade Analytics on your own machine logs and show you where the time and money went.</p>
+      <p class="pilot-foot">No new hardware needed to start.</p>
+    </aside>
+  </div>
+</header>
+
+<main>
+  <section class="statement" aria-label="The problem">
+    <div class="wrap statement-grid">
+      <p class="big">On a linear site, one late tipper stalls an excavator, <span>and that excavator stalls the grader behind it.</span></p>
+      <div class="statement-side">
+        <p>Machine telematics reports yesterday's totals, one machine at a time. Nobody sees the queue forming until the shift is already lost.</p>
+        <p>Grade watches the whole fleet together, in the order the work happens.</p>
+        <ol class="cycle" aria-label="The earthworks cycle"><li>Dig</li><li>Load</li><li>Haul</li><li>Dump</li><li>Grade</li></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="story" id="fleet" aria-label="The fleet at work">
+    <div class="pin" id="storyPin">
+      <canvas id="storyCanvas" aria-hidden="true"></canvas>
+      <!-- To use a filmed version instead of the drawn scenes, set data-src="media/fleet-story.mp4" (see README.md). -->
+      <video id="storyVideo" data-src="" muted playsinline preload="auto" hidden aria-hidden="true"></video>
+      <div class="story-ui wrap">
+        <p class="eyebrow">The fleet at work</p>
+        <h2>Every terrain. One fleet, working in order.</h2>
+        <ol class="stages">
+          <li class="stage is-active"><span class="stage-no">01 / 06 · Plot</span><h3>House build</h3><p>Footings dug, spoil hauled out, the pad levelled. On a tight plot, every machine is waiting on another one.</p></li>
+          <li class="stage"><span class="stage-no">02 / 06 · Pipeline</span><h3>Pipeline trench</h3><p>A trench only moves as fast as the tippers come back. Grade sees the gap before the excavator stops.</p></li>
+          <li class="stage"><span class="stage-no">03 / 06 · Highway</span><h3>Desert highway</h3><p>Long hauls on open sand. The grader follows the cut, so one late load holds up the finished road.</p></li>
+          <li class="stage"><span class="stage-no">04 / 06 · Road clearance</span><h3>Mountain rock slide</h3><p>Rock across the only lane. The dozer clears, the excavator loads, the tippers take turns. Order matters more than speed.</p></li>
+          <li class="stage"><span class="stage-no">05 / 06 · Access road</span><h3>Forest road</h3><p>One way in, one way out. On a narrow track through the trees, one tipper in the wrong place blocks everything.</p></li>
+          <li class="stage"><span class="stage-no">06 / 06 · Long-term vision</span><h3>Moon &amp; Mars</h3><p>Later, the same coordination where nobody can sit in the cab.</p></li>
+        </ol>
+        <p class="story-note">Illustration. Our first pilots are pipeline and highway earthworks.</p>
+      </div>
+      <div class="progress wrap" aria-hidden="true">
+        <div class="seg is-active"><span>House</span><b><i></i></b></div>
+        <div class="seg"><span>Trench</span><b><i></i></b></div>
+        <div class="seg"><span>Desert</span><b><i></i></b></div>
+        <div class="seg"><span>Mountain</span><b><i></i></b></div>
+        <div class="seg"><span>Forest</span><b><i></i></b></div>
+        <div class="seg"><span>Moon · Mars</span><b><i></i></b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="facts-sec" aria-label="In numbers">
+    <div class="wrap facts">
+      <div class="fact"><b>10<small>Hz</small></b><span>Our first Data Collection Kit prototype streams camera, motion and GPS data ten times a second.</span></div>
+      <div class="fact"><b>3</b><span>Machine types in the cycle Grade models: excavator, tipper, grader.</span></div>
+      <div class="fact"><b>6</b><span>Products, from site analytics to machine autonomy.</span></div>
+      <div class="fact"><b>0</b><span>New hardware needed to start a pilot.</span></div>
+    </div>
+  </section>
+
+  <section class="products" id="products">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Products</p>
+        <h2>Start with the software. Add machines when you're ready.</h2>
+        <p class="sec-lede">Every product is tagged with where it actually stands today.</p>
+      </div>
+
+      <h3 class="group">Software</h3>
+      <div class="prod-grid">
+        <article class="prod">
+          <div class="icon"><svg viewBox="-2 -2 52 52" aria-hidden="true"><rect class="f" x="6" y="30" width="6" height="12"/><rect class="f" x="16" y="25" width="6" height="17"/><rect class="f" x="26" y="28" width="6" height="14"/><rect class="f" x="36" y="21" width="6" height="21"/><polyline points="6,20 17,13 27,17 42,5"/><polyline points="34,5 42,5 42,13"/></svg></div>
+          <h4>Grade Analytics</h4>
+          <p>Shows where your site's time and money went: production against plan, lost hours and cost per m³.</p>
+          <span class="status">Available for pilots</span>
+        </article>
+        <article class="prod">
+          <div class="icon"><svg viewBox="-2 -2 52 52" aria-hidden="true"><polyline points="2,26 13,26 18,16 25,38 32,8 37,26 46,26"/></svg></div>
+          <h4>Grade Heartbeat</h4>
+          <p>The live pulse of your site: today's bottleneck, which truck to move, and what the next 15 minutes look like.</p>
+          <span class="status">Available for pilots</span>
+        </article>
+        <article class="prod">
+          <div class="icon"><svg viewBox="-2 -2 52 52" aria-hidden="true"><rect x="12" y="3" width="24" height="42" rx="3"/><line x1="21" y1="9" x2="27" y2="9"/><line x1="18" y1="19" x2="30" y2="19"/><line x1="18" y1="26" x2="30" y2="26"/><line x1="18" y1="33" x2="25" y2="33"/><circle class="f" cx="24" cy="40" r="1.8"/></svg></div>
+          <h4>Grade App</h4>
+          <p>Alerts, the daily site report and the shift handover, on the foreman's phone.</p>
+          <span class="status soft">In development</span>
+        </article>
+      </div>
+
+      <h3 class="group">Hardware &amp; autonomy</h3>
+      <div class="prod-grid hw">
+        <article class="prod">
+          <div class="icon"><svg viewBox="-2 -2 52 52" aria-hidden="true"><rect x="4" y="18" width="28" height="25" rx="2"/><circle cx="18" cy="30.5" r="6"/><circle class="f" cx="27" cy="23" r="1.8"/><path d="M34 11 A7 7 0 0 1 41 18"/><path d="M34 4 A14 14 0 0 1 48 18"/></svg></div>
+          <h4>Grade Data Collection Kit</h4>
+          <p>A battery-powered camera, GPS and motion sensor pod that brings any machine online.</p>
+          <span class="status soft">Pilot units in build</span>
+        </article>
+        <article class="prod">
+          <div class="icon"><svg viewBox="-2 -2 52 52" aria-hidden="true"><rect x="8" y="34" width="32" height="10" rx="2"/><line x1="24" y1="34" x2="24" y2="20"/><circle cx="24" cy="14" r="5.5"/><path d="M34 6 A11 11 0 0 1 34 22"/><path d="M14 6 A11 11 0 0 0 14 22"/></svg></div>
+          <h4>Grade Teleoperation</h4>
+          <p>Operate excavators remotely through a browser, with the operator out of the cab and away from hazards.</p>
+          <span class="status soft">In development</span>
+        </article>
+        <article class="prod">
+          <div class="icon"><svg viewBox="-2 -2 52 52" aria-hidden="true"><rect x="2" y="37" width="26" height="8" rx="4"/><rect x="5" y="25" width="17" height="12"/><polyline points="21,27 33,9 44,21"/><polyline points="44,21 45,31 36,31 44,21"/></svg></div>
+          <h4>Grade Autonomy</h4>
+          <p>Semi and full autonomy: machines run the dig, load, haul, dump and grade cycle, coordinated as one fleet.</p>
+          <span class="status soft">In development</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="built" id="built">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">What's built</p>
+        <h2>Built, and labelled for exactly what it is.</h2>
+        <p class="sec-lede">We'd rather you trust a small claim than doubt a big one.</p>
+      </div>
+      <ul class="built-list">
+        <li><h3>Data Collection Kit, prototype 1</h3><p>A physical sensor pod with a camera, 9-axis motion sensor, barometer and GPS, streaming live to a dashboard at 10 Hz.</p><span class="tag">Hardware prototype</span></li>
+        <li><h3>Teleoperation</h3><p>Browser-based remote control of an excavator: sliders, keyboard jog and go-to-position, tested end to end on a simulated machine. A person drives it.</p><span class="tag">Simulated machine</span></li>
+        <li><h3>Autonomy cycle</h3><p>One machine running the full excavate, load, haul, dump and grade loop, validated in NVIDIA Isaac Sim.</p><span class="tag">Simulation · one machine</span></li>
+        <li><h3>Fleet forecast</h3><p>Clones a site, steps it forward in time, and compares the run with and without coordination to flag bunching before it happens.</p><span class="tag">Simulation</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap" aria-label="Contact">
+    <div class="cta">
+      <div>
+        <p class="eyebrow">Start with a pilot</p>
+        <h2>Bring your machine logs. We'll show you where the day went.</h2>
+        <p>Grade Analytics runs on the data your fleet already produces. No new hardware, nothing to install on site to begin.</p>
+      </div>
+      <a class="btn btn-dark" href="mailto:jiten@grade-robotics.com?subject=Grade%20pilot">jiten@grade-robotics.com</a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="titleblock">
+    <div class="tb tb-logo"><img src="logo.svg" alt="Grade Robotics" width="706" height="222"></div>
+    <div class="tb"><span>Scope</span>Pipelines · Highways · Earthworks</div>
+    <div class="tb"><span>Contact</span><a href="mailto:jiten@grade-robotics.com">jiten@grade-robotics.com</a></div>
+    <div class="tb"><span>Web</span>grade-robotics.com</div>
+    <div class="tb"><span>Sheet</span>1 of 1 · Rev A · 2026</div>
+  </div>
+  <p class="fine">© 2026 Grade Robotics. Machine scenes on this page are illustrations, not footage from a customer site.</p>
+</footer>
+
+<script>
+(() => {
+  // Fleet scenes drawn on canvas: one excavator, two tippers and a grader or dozer per scene,
+  // cycling in sync (the excavator loads whichever tipper is parked). World units: ground at y=0.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const INK = '#E9E3DB', FILL = '#24211E', OR = '#D9521A';
+  const BW = 1600, N = 6;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const mix = (a, b, u) => '#' + rgb(a).map((v, i) => Math.round(v + (rgb(b)[i] - v) * u).toString(16).padStart(2, '0')).join('');
+  const rng = s => () => (s = s * 16807 % 2147483647) / 2147483647;
+
+  const BIOMES = [
+    { sky: '#5A4133', ground: '#3A2E25', load: '#8B4A2B', extra: 'grader' }, // house build
+    { sky: '#4E3B2E', ground: '#3B2B21', load: '#8B4A2B', extra: 'dozer' },  // pipeline trench
+    { sky: '#A06A3C', ground: '#6E5436', load: '#B08A5A', extra: 'grader' }, // desert
+    { sky: '#46505A', ground: '#35342F', load: '#77726B', extra: 'dozer' },  // mountain
+    { sky: '#33413A', ground: '#2A2B21', load: '#6A5238', extra: 'grader' }, // forest
+    { sky: '#101115', ground: '#4A4A4B', load: '#8A8A88', extra: 'dozer' },  // moon, then Mars
+  ];
+  const MARS = { sky: '#8E4A2A', ground: '#6E3520' };
+  const stops = key => {
+    const s = [];
+    for (let i = 0; i < 5; i++) s.push([i * BW + 300, BIOMES[i][key]], [i * BW + 1300, BIOMES[i][key]]);
+    s.push([5 * BW + 150, BIOMES[5][key]], [5 * BW + 650, BIOMES[5][key]], [5 * BW + 1000, MARS[key]], [6 * BW + 400, MARS[key]]);
+    return s;
+  };
+  const SKY = stops('sky'), GROUND = stops('ground');
+
+  // ---- drawing primitives (machine-local units, lineWidth set by place()) ----
+  function path(c, a, close = true) { c.beginPath(); c.moveTo(a[0], a[1]); for (let i = 2; i < a.length; i += 2) c.lineTo(a[i], a[i + 1]); if (close) c.closePath(); }
+  function shape(c, a, fill = FILL) { path(c, a); c.fillStyle = fill; c.fill(); c.stroke(); }
+  function wheel(c, x, y, r) { const q = r * 0.4142; shape(c, [x - q, y - r, x + q, y - r, x + r, y - q, x + r, y + q, x + q, y + r, x - q, y + r, x - r, y + q, x - r, y - q]); c.fillStyle = INK; c.fillRect(x - 3, y - 3, 6, 6); }
+  function bar(c, a, w) { path(c, a, false); const lw = c.lineWidth; c.lineWidth = w + lw * 2; c.strokeStyle = INK; c.stroke(); c.lineWidth = w; c.strokeStyle = FILL; c.stroke(); c.lineWidth = lw; c.strokeStyle = INK; }
+  function glass(c, a) { const lw = c.lineWidth; c.lineWidth = lw * 0.5; shape(c, a, '#34302B'); c.lineWidth = lw; }
+  function bug(c, x, y) { c.fillStyle = OR; c.fillRect(x - 6, y - 6, 12, 12); } // the Data Collection Kit on the cab roof
+  function tracks(c, L) { shape(c, [-L, -17, -L + 17, -34, L - 17, -34, L, -17, L - 17, 0, -L + 17, 0]); c.fillStyle = INK; for (let i = 0; i < 5; i++) c.fillRect(-L + 30 + i * (2 * L - 60) / 4 - 4, -21, 8, 8); }
+  function pine(x, y, h) { const w = h * 0.32; return [x, y - h, x + w * 0.55, y - h * 0.62, x + w * 0.3, y - h * 0.62, x + w * 0.8, y - h * 0.28, x + w * 0.45, y - h * 0.28, x + w, y, x - w, y, x - w * 0.45, y - h * 0.28, x - w * 0.8, y - h * 0.28, x - w * 0.3, y - h * 0.62, x - w * 0.55, y - h * 0.62]; }
+
+  // ---- machines, facing right, origin on the ground under the machine ----
+  function excavator(c, p, loaded, col) {
+    tracks(c, 115);
+    shape(c, [-108, -38, -108, -78, -94, -92, 92, -92, 92, -38]);
+    shape(c, [22, -92, 22, -168, 62, -168, 88, -142, 88, -92]);
+    glass(c, [32, -104, 32, -158, 58, -158, 78, -138, 78, -104]);
+    c.save(); c.translate(84, -70); c.rotate(p[0]);
+    bar(c, [0, 0, 95, -95, 200, -80], 22);
+    c.translate(200, -80); c.rotate(p[1]);
+    bar(c, [0, -20, 0, 150], 15);
+    c.translate(0, 150); c.rotate(p[2]);
+    if (loaded) shape(c, [-4, -6, 26, -6, 16, -24, 2, -22], col);
+    shape(c, [-8, -6, 28, -6, 44, 26, 22, 44, -8, 28]);
+    c.restore();
+    bug(c, 42, -176);
+  }
+  function tipper(c, tilt, load, col) {
+    wheel(c, -66, -18, 18); wheel(c, -26, -18, 18); wheel(c, 72, -18, 18);
+    shape(c, [-106, -32, 106, -32, 106, -46, -106, -46]);
+    shape(c, [58, -46, 58, -106, 84, -106, 106, -84, 106, -46]);
+    glass(c, [66, -60, 66, -98, 82, -98, 98, -82, 98, -60]);
+    c.save(); c.translate(-106, -48); c.rotate(tilt);
+    if (load > 0.02) { const h = 30 * load; shape(c, [8, -52, 150, -52, 120, -52 - h, 36, -52 - h * 1.15], col); }
+    shape(c, [0, 0, -8, -52, 156, -52, 156, 0]);
+    c.restore();
+    bug(c, 76, -112);
+  }
+  function grader(c) {
+    wheel(c, -130, -20, 20); wheel(c, -86, -20, 20); wheel(c, 152, -18, 18);
+    bar(c, [-40, -98, 128, -98, 152, -74, 152, -40], 14);
+    bar(c, [118, -94, 36, -24], 7);
+    shape(c, [-20, 0, 66, 0, 74, -26, -12, -26]);
+    shape(c, [-168, -40, -168, -84, -110, -84, -110, -40]);
+    shape(c, [-112, -40, -112, -152, -62, -152, -42, -132, -42, -40]);
+    glass(c, [-102, -94, -102, -144, -66, -144, -52, -130, -52, -94]);
+    bug(c, -86, -158);
+  }
+  function dozer(c) {
+    tracks(c, 95);
+    bar(c, [30, -44, 104, -34], 10);
+    shape(c, [104, 4, 104, -80, 118, -94, 126, -94, 126, 4]);
+    shape(c, [-92, -36, -92, -94, 40, -94, 62, -72, 62, -36]);
+    shape(c, [-72, -94, -72, -154, -24, -154, -2, -132, -2, -94]);
+    glass(c, [-62, -104, -62, -146, -28, -146, -12, -130, -12, -104]);
+    bug(c, -48, -160);
+  }
+
+  // Excavator dig cycle: [boom, stick, bucket] angles, 4 s per cycle. It dumps at 0.62-0.74.
+  const KF = [[0, [0.12, -0.70, -0.5]], [0.14, [-0.12, -0.10, 0.1]], [0.28, [0.10, 0.50, 0.9]], [0.48, [-0.55, -0.05, 0.9]], [0.62, [-0.60, -0.10, -1.1]], [0.74, [-0.60, -0.10, -1.1]], [1, [0.12, -0.70, -0.5]]];
+  function exPose(f) {
+    for (let i = 0; i < KF.length - 1; i++) {
+      const [a, A] = KF[i], [b, B] = KF[i + 1];
+      if (f <= b) { const u = ease((f - a) / (b - a)); return A.map((v, j) => lerp(v, B[j], u)); }
+    }
+    return KF[0][1];
+  }
+  // Tipper cycle, 8 s. Two tippers half a cycle apart, so one is parked at each excavator dump.
+  const LANES = [null, { y: -14, k: 0.92 }, { y: -30, k: 0.82 }];
+  const TIP_LABEL = { arrive: 'ASSIGNED TO EX-01', park: 'AT EX-01', haul: 'ROUTED TO DUMP B', dump: 'DUMPING' };
+  function tipState(f, lx, dx) {
+    if (f < 0.08) return { x: lerp(lx + 150, lx, ease(f / 0.08)), lane: 1, dir: 1, load: 0, tilt: 0, s: 'arrive' };
+    if (f < 0.45) return { x: lx, lane: 1, dir: 1, load: clamp((f - 0.31) / 0.06), tilt: 0, s: 'park' };
+    if (f < 0.62) return { x: lerp(lx, dx, ease((f - 0.45) / 0.17)), lane: 1, dir: 1, load: 1, tilt: 0, s: 'haul' };
+    if (f < 0.78) { const u = (f - 0.62) / 0.16; return { x: dx, lane: 1, dir: 1, load: 1 - clamp(u * 1.8 - 0.25), tilt: -0.62 * Math.sin(Math.PI * u), s: 'dump' }; }
+    return { x: lerp(dx, lx + 150, ease((f - 0.78) / 0.22)), lane: 2, dir: -1, load: 0, tilt: 0, s: 'ret' };
+  }
+
+  // ---- view transforms ----
+  function world(c, V) { c.setTransform(V.dpr * V.s, 0, 0, V.dpr * V.s, V.dpr * (V.W / 2 - V.cam * V.s), V.dpr * V.base); }
+  function place(c, V, x, y, k, dir) { world(c, V); c.translate(x, y); c.scale(dir * k, k); c.lineWidth = 3; c.strokeStyle = INK; c.lineJoin = 'miter'; c.lineCap = 'square'; }
+  const scr = (V, x, y) => [V.W / 2 + (x - V.cam) * V.s, V.base + y * V.s];
+  function hgrad(c, st) { const a = st[0][0], z = st[st.length - 1][0], g = c.createLinearGradient(a, 0, z, 0); for (const [x, col] of st) g.addColorStop((x - a) / (z - a), col); return g; }
+
+  function crew(c, V, b, extra, col, t, chips) {
+    const ex = b + 560, lx = ex + 330, dx = ex + 760;
+    world(c, V); c.lineWidth = 2; c.strokeStyle = 'rgba(233,227,219,.35)'; c.lineJoin = 'miter';
+    path(c, [ex + 160, 1, ex + 430, 1, ex + 400, 28, ex + 190, 28]); c.fillStyle = 'rgba(0,0,0,.35)'; c.fill();
+    shape(c, [dx - 290, -30, dx - 30, -30, dx - 100, -98, dx - 210, -104], col);
+    if (extra === 'grader') { c.fillStyle = 'rgba(255,255,255,.05)'; c.fillRect(b - 40, 6, 520, 26); }
+    const tips = [0, 0.5].map((o, j) => Object.assign(tipState((t / 8 + o) % 1, lx, dx), { id: 'TP-0' + (3 + j) }));
+    for (const lane of [2, 1]) for (const s of tips) if (s.lane === lane) {
+      const L = LANES[lane]; place(c, V, s.x, L.y, L.k, s.dir);
+      c.globalAlpha = lane === 2 ? 0.72 : 1; tipper(c, s.tilt, s.load, col); c.globalAlpha = 1;
+    }
+    const fe = (t / 4) % 1;
+    place(c, V, ex, 0, 1, 1); excavator(c, exPose(fe), fe > 0.24 && fe < 0.63, col);
+    const k = extra === 'grader' ? 0.92 : 0.95, gx = b + 230 + 95 * Math.sin(t * 2 * Math.PI / (extra === 'grader' ? 14 : 10));
+    place(c, V, gx, 18, k, 1); extra === 'grader' ? grader(c) : dozer(c);
+
+    const eb = scr(V, ex + 42, -176), parked = tips.find(s => s.lane === 1 && (s.s === 'park' || s.s === 'arrive'));
+    chips.push({ at: eb, text: 'EX-01 · ' + (parked && parked.s === 'park' && fe > 0.45 && fe < 0.78 ? 'LOADING ' + parked.id : 'DIGGING') });
+    for (const s of tips) {
+      const L = LANES[s.lane], at = scr(V, s.x + s.dir * L.k * 76, L.y - L.k * 112);
+      if (s === parked) chips.push({ link: [eb, at] });
+      if (s.s !== 'ret') chips.push({ at, text: s.id + ' · ' + TIP_LABEL[s.s], minor: true });
+    }
+    chips.push(extra === 'grader'
+      ? { at: scr(V, gx - 86 * k, 18 - 158 * k), text: 'GR-01 · FINISHING PASS', minor: true }
+      : { at: scr(V, gx - 48 * k, 18 - 160 * k), text: 'DZ-01 · CLEARING', minor: true });
+  }
+
+  // ---- scenery ----
+  const FAR = BIOMES.map((B, i) => {
+    const r = rng(11 + i * 97), back = mix(B.sky, '#0B0B0B', 0.38), front = mix(B.sky, '#0B0B0B', 0.6), out = [];
+    const ridge = (fn, col) => { const p = [-720, 0]; for (let x = -720; x <= 720; x += 20) p.push(x, -fn(x)); p.push(720, 0); out.push({ p, c: col }); };
+    if (i === 0) for (const col of [back, front]) for (let x = -700; x < 680; x += 60 + r() * 70) { const w = 60 + r() * 70, h = 26 + r() * 50; out.push({ p: [x, 0, x, -h, x + w / 2, -h - w * 0.42, x + w, -h, x + w, 0], c: col }); }
+    if (i === 1) { ridge(x => 62 + 34 * Math.sin(x / 150) + 14 * Math.sin(x / 51 + 2), back); ridge(x => 28 + 18 * Math.sin(x / 95 + 1) + 10 * Math.sin(x / 37), front); }
+    if (i === 2) { ridge(x => 86 + 52 * Math.sin(x / 170) + 20 * Math.sin(x / 67 + 1), back); ridge(x => 36 + 28 * Math.sin(x / 120 + 2) + 8 * Math.sin(x / 43), front); }
+    if (i === 3) for (const col of [back, front]) for (let k = 0; k < 5; k++) { const x = -620 + k * 300 + r() * 120, h = (col === back ? 240 : 150) + r() * 200, w = h * 0.8; out.push({ p: [x - w, 0, x - w * 0.2, -h * 0.9, x, -h, x + w * 0.25, -h * 0.85, x + w, 0], c: col }); }
+    if (i === 4) for (const col of [back, front]) for (let x = -710; x < 700; x += 16 + r() * 24) out.push({ p: pine(x, 0, (col === back ? 110 : 70) + r() * 80), c: col });
+    if (i === 5) {
+      const p = [-720, 0]; for (let x = -720; x <= -40; x += 20) p.push(x, -(22 + 14 * Math.sin(x / 60) + 9 * Math.sin(x / 23))); p.push(-40, 0);
+      out.push({ p, c: '#34353A' });
+      const m = mix(MARS.sky, '#0B0B0B', 0.45);
+      for (const [x, w, h] of [[90, 170, 70], [300, 120, 110], [480, 210, 60]]) out.push({ p: [x, 0, x + 26, -h, x + w - 26, -h, x + w, 0], c: m });
+    }
+    return out;
+  });
+  const TREES = []; { const r = rng(5); for (let x = 0; x < BW; x += 60 + r() * 70) TREES.push([x, 170 + r() * 170]); }
+  const STARS = []; { const r = rng(3); for (let i = 0; i < 150; i++) STARS.push([r(), r(), r()]); }
+
+  const PROPS = [
+    (c, V, b) => { // house under construction: slab, stud walls, roof trusses
+      world(c, V); c.lineWidth = 2.5; c.strokeStyle = 'rgba(233,227,219,.55)'; c.lineCap = 'butt';
+      const x0 = b + 40, x1 = b + 420, y = -36, h = 120, m = (x0 + x1) / 2, rh = 110;
+      c.fillStyle = '#4A3B30'; c.fillRect(x0 - 14, y, x1 - x0 + 28, 10);
+      c.beginPath();
+      for (let x = x0; x <= x1 + 1; x += 38) { c.moveTo(x, y); c.lineTo(x, y - h); }
+      c.moveTo(x0, y - h); c.lineTo(x1, y - h); c.moveTo(x0, y - h / 2); c.lineTo(x1, y - h / 2);
+      c.moveTo(x0 - 16, y - h); c.lineTo(m, y - h - rh); c.lineTo(x1 + 16, y - h);
+      c.moveTo(m, y - h); c.lineTo(m, y - h - rh);
+      c.moveTo(m, y - h); c.lineTo((x0 + m) / 2, y - h - rh / 2); c.moveTo(m, y - h); c.lineTo((m + x1) / 2, y - h - rh / 2);
+      c.stroke();
+    },
+    (c, V, b) => { // pipe string on skids, and the trench ahead of the excavator
+      world(c, V); c.lineWidth = 2; c.strokeStyle = 'rgba(233,227,219,.5)';
+      for (let x = b + 20; x < b + 480; x += 114) {
+        c.fillStyle = '#2F2A25'; c.fillRect(x + 18, -50, 12, 16); c.fillRect(x + 80, -50, 12, 16);
+        c.fillStyle = '#5B5D5A'; c.fillRect(x, -72, 110, 22); c.strokeRect(x, -72, 110, 22);
+      }
+      c.fillStyle = 'rgba(0,0,0,.5)'; c.fillRect(b + 700, 4, BW - 640, 24);
+    },
+    (c, V, b) => { // survey stakes along the corridor
+      world(c, V); c.lineWidth = 2; c.strokeStyle = 'rgba(233,227,219,.6)';
+      c.beginPath(); for (let x = b + 60; x < b + BW; x += 170) { c.moveTo(x, -36); c.lineTo(x, -6); } c.stroke();
+      c.fillStyle = OR; for (let x = b + 60; x < b + BW; x += 170) c.fillRect(x, -36, 11, 7);
+    },
+    (c, V, b, t) => { // slope and rock slide onto the road
+      world(c, V); c.lineWidth = 2; c.strokeStyle = 'rgba(233,227,219,.22)'; c.lineJoin = 'miter';
+      shape(c, [b - 120, -40, b + 110, -250, b + 250, -320, b + 430, -560, b + 640, -400, b + 840, -330, b + 1120, -40], '#2B2D2F');
+      c.lineWidth = 2.5; c.strokeStyle = INK;
+      for (let k = 0; k < 8; k++) {
+        const f = (t / 9 + k * 0.125) % 1, q = clamp(f / 0.3) ** 2, r = 13 + (k % 4) * 5;
+        c.globalAlpha = f < 0.04 ? f / 0.04 : f > 0.85 ? (1 - f) / 0.15 : 1;
+        c.save(); c.translate(lerp(b + 380 + k * 14, b + 170 + k * 44, q), lerp(-420 + k * 16, -6 - (k % 3) * 6, q)); c.rotate(q * 4 + k);
+        shape(c, [-r, -r * 0.3, -r * 0.4, -r, r * 0.6, -r * 0.8, r, 0, r * 0.4, r * 0.8, -r * 0.7, r * 0.6], '#5E5A54');
+        c.restore();
+      }
+      c.globalAlpha = 1;
+    },
+    (c, V, b) => { // trees behind the track, stumps on it
+      world(c, V); c.lineWidth = 2; c.strokeStyle = 'rgba(233,227,219,.18)'; c.lineJoin = 'miter';
+      for (const [x, h] of TREES) shape(c, pine(b + x, -38, h), '#1C221E');
+      c.fillStyle = '#4A3A2A'; for (let x = b + 90; x < b + 430; x += 85) c.fillRect(x, -10, 16, 12);
+    },
+    (c, V, b) => { // moon craters, then a Mars habitat
+      world(c, V);
+      for (const [x, w] of [[90, 110], [330, 70], [720, 90]]) {
+        c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(b + x, 14, w, w * 0.13, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = 'rgba(233,227,219,.25)'; c.lineWidth = 2; c.beginPath(); c.ellipse(b + x, 14, w, w * 0.13, 0, 0, Math.PI); c.stroke();
+      }
+      c.lineWidth = 2.5; c.strokeStyle = INK; c.fillStyle = FILL;
+      c.beginPath(); c.arc(b + 1480, -40, 90, Math.PI, 0); c.closePath(); c.fill(); c.stroke();
+      c.beginPath(); c.moveTo(b + 1480, -130); c.lineTo(b + 1480, -40); c.moveTo(b + 1416, -104); c.lineTo(b + 1480, -40); c.lineTo(b + 1544, -104); c.stroke();
+    },
+  ];
+  const FG = { 4: (c, V, b) => { world(c, V); c.lineWidth = 2; c.strokeStyle = 'rgba(233,227,219,.12)'; for (const x of [b + 30, b + 1570]) shape(c, pine(x, 90, 560), '#0F1311'); } };
+
+  function drawSky(c, V) {
+    const x0 = V.cam - V.W / 2 / V.s - 50, top = -V.base / V.s - 5;
+    world(c, V); c.fillStyle = hgrad(c, SKY); c.fillRect(x0, top, V.W / V.s + 100, -40 - top);
+    c.setTransform(V.dpr, 0, 0, V.dpr, 0, 0);
+    const g = c.createLinearGradient(0, 0, 0, V.base - 40 * V.s); g.addColorStop(0, 'rgba(10,10,11,.9)'); g.addColorStop(1, 'rgba(10,10,11,0)');
+    c.fillStyle = g; c.fillRect(0, 0, V.W, V.base);
+    const sp = clamp((V.cam - (5 * BW - 900)) / 900) * (1 - 0.6 * clamp((V.cam - (5 * BW + 700)) / 600));
+    if (sp <= 0) return;
+    c.fillStyle = '#F2EDE7';
+    for (const [x, y, r] of STARS) { c.globalAlpha = sp * (0.3 + r * 0.6); c.fillRect(((x * V.W * 1.7 - V.cam * V.s * 0.04) % V.W + V.W) % V.W, y * (V.base - 70 * V.s), 1 + r, 1 + r); }
+    const ex = V.W / 2 + (5 * BW + 480 - V.cam) * V.s * 0.3, ey = (V.base - 40 * V.s) * 0.3, er = 16 + 30 * V.s;
+    c.globalAlpha = sp; c.save(); c.beginPath(); c.arc(ex, ey, er, 0, Math.PI * 2); c.fillStyle = '#3F6E9E'; c.fill(); c.clip();
+    c.fillStyle = '#0B0C0E'; c.beginPath(); c.arc(ex - er * 0.5, ey - er * 0.15, er, 0, Math.PI * 2); c.fill(); c.restore();
+    c.globalAlpha = 1;
+  }
+  function drawFar(c, V) {
+    const f = 0.5, g = 0.6;
+    for (let i = 0; i < N; i++) {
+      const cx = V.W / 2 + (i * BW + 800 - V.cam) * f * V.s;
+      if (Math.abs(cx - V.W / 2) > V.W / 2 + 720 * g * V.s) continue;
+      c.setTransform(V.dpr * V.s * g, 0, 0, V.dpr * V.s * g, V.dpr * cx, V.dpr * (V.base - 40 * V.s));
+      for (const it of FAR[i]) { path(c, it.p); c.fillStyle = it.c; c.fill(); }
+    }
+  }
+  function drawGround(c, V, hero) {
+    const x0 = V.cam - V.W / 2 / V.s - 50, w = V.W / V.s + 100, bot = (V.H - V.base) / V.s + 5;
+    world(c, V);
+    c.fillStyle = hero ? '#211E1B' : hgrad(c, GROUND); c.fillRect(x0, -40, w, bot + 40);
+    c.fillStyle = 'rgba(255,255,255,.035)'; c.fillRect(x0, -30, w, 58);
+    c.fillStyle = 'rgba(233,227,219,.22)'; c.fillRect(x0, -40, w, 1.5 / V.s);
+    c.setTransform(V.dpr, 0, 0, V.dpr, 0, 0);
+    const g = c.createLinearGradient(0, V.base + 30 * V.s, 0, V.H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.45)');
+    c.fillStyle = g; c.fillRect(0, V.base, V.W, V.H - V.base);
+  }
+  function drawChips(c, V, chips, t) {
+    c.setTransform(V.dpr, 0, 0, V.dpr, 0, 0);
+    c.lineWidth = 1.5; c.strokeStyle = OR; c.setLineDash([5, 5]); c.lineDashOffset = -t * 24;
+    for (const ch of chips) if (ch.link) { const [a, b] = ch.link; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); }
+    c.setLineDash([]);
+    c.font = '500 11px "JetBrains Mono", Consolas, monospace'; c.textBaseline = 'middle';
+    const few = V.s < 0.5;
+    for (const ch of chips) {
+      if (!ch.text || (few && ch.minor)) continue;
+      const [x, y] = ch.at; if (x < -240 || x > V.W + 20) continue;
+      const w = c.measureText(ch.text).width + 30, h = 22, top = Math.round(y - 50);
+      c.beginPath(); c.moveTo(Math.round(x) + 0.5, y - 6); c.lineTo(Math.round(x) + 0.5, top + h); c.stroke();
+      c.fillStyle = 'rgba(18,17,16,.86)'; c.fillRect(Math.round(x), top, w, h);
+      c.fillStyle = OR; c.fillRect(Math.round(x) + 9, top + h / 2 - 3, 6, 6);
+      c.fillStyle = '#F2EDE7'; c.fillText(ch.text, Math.round(x) + 21, top + h / 2 + 0.5);
+    }
+  }
+  function drawWorld(c, V, t, hero) {
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+    const chips = [];
+    if (hero) { drawGround(c, V, true); crew(c, V, 0, 'grader', '#8B4A2B', t, chips); }
+    else {
+      drawSky(c, V); drawFar(c, V); drawGround(c, V, false);
+      const half = V.W / 2 / V.s;
+      for (let i = 0; i < N; i++) {
+        const b = i * BW; if (b + BW + 500 < V.cam - half || b - 500 > V.cam + half) continue;
+        PROPS[i](c, V, b, t); crew(c, V, b, BIOMES[i].extra, BIOMES[i].load, t + i * 1.7, chips); if (FG[i]) FG[i](c, V, b);
+      }
+    }
+    drawChips(c, V, chips, t);
+  }
+
+  // ---- views, scroll and the frame loop ----
+  function makeView(canvas, watch, fit) {
+    const v = { canvas, c: canvas.getContext('2d'), V: { W: 1, H: 1, dpr: 1, s: 1, base: 1, cam: 800 }, fit, on: true };
+    const size = () => { const r = canvas.getBoundingClientRect(), V = v.V; V.W = Math.max(1, r.width); V.H = Math.max(1, r.height); V.dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = Math.round(V.W * V.dpr); canvas.height = Math.round(V.H * V.dpr); fit(V); };
+    new ResizeObserver(size).observe(canvas); size();
+    new IntersectionObserver(e => { v.on = e[0].isIntersecting; }).observe(watch);
+    return v;
+  }
+  const heroCanvas = document.getElementById('heroCanvas');
+  const hero = makeView(heroCanvas, heroCanvas, V => { V.s = Math.min(V.H / 560, V.W / 760); V.base = V.H * 0.86; V.cam = V.W < 700 ? 820 : 720; });
+  const storyEl = document.getElementById('fleet'), pin = document.getElementById('storyPin');
+  const story = makeView(document.getElementById('storyCanvas'), pin, V => { V.s = Math.min(V.H / 900, V.W / (V.W < V.H ? 560 : 800)); V.base = V.H * (V.W < V.H ? 0.72 : 0.76); });
+  const stages = [...document.querySelectorAll('.stage')], segs = [...document.querySelectorAll('.seg')], fills = segs.map(s => s.querySelector('i'));
+  const video = document.getElementById('storyVideo');
+  let useVideo = false, active = 0, camX = 800, t = 2.7, last = performance.now();
+  video.addEventListener('loadeddata', () => { useVideo = true; video.hidden = false; story.canvas.hidden = true; });
+  if (video.dataset.src) video.src = video.dataset.src;
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!reduce) t += dt;
+    if (hero.on) drawWorld(hero.c, hero.V, t, true);
+    if (story.on) {
+      const r = storyEl.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - innerHeight));
+      const u = Math.min(p * (N - 0.4), N - 1), i = Math.floor(u), f = u - i;
+      const target = 800 + BW * (i + (i < N - 1 ? ease((f - 0.55) / 0.45) : 0)); // hold on each scene, then a quick pan
+      camX += (target - camX) * (reduce ? 1 : 0.14);
+      const k = Math.min(N - 1, Math.floor(u + 0.22));
+      if (k !== active) { stages[active].classList.remove('is-active'); segs[active].classList.remove('is-active'); stages[k].classList.add('is-active'); segs[k].classList.add('is-active'); active = k; }
+      fills.forEach((el, j) => { el.style.transform = 'scaleX(' + clamp(p * N - j) + ')'; });
+      if (useVideo) { const want = p * (video.duration || 0); if (Math.abs(video.currentTime - want) > 0.04) video.currentTime = want; }
+      else { story.V.cam = camX; drawWorld(story.c, story.V, t, false); }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
